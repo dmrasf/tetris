@@ -51,19 +51,16 @@ func layout(g *gocui.Gui) error {
 
 func move(g *gocui.Gui) {
 	for {
-		time.Sleep(1 * time.Second)
-		arr := getShapeArr(SQUARE, UP, pos)
-		deleteShape(g, &arr)
+		time.Sleep(400 * time.Millisecond)
+		if len(ShapeArr) != 0 {
+			deleteShape(g, &ShapeArr)
+		}
 		pos[1]++
-		arr1 := getShapeArr(SQUARE, UP, pos)
-		drawShape(g, &arr1)
+		ShapeArr = getShapeArr(L, CurrentPos, pos)
+		drawShape(g, &ShapeArr)
 
 		g.Update(func(g *gocui.Gui) error {
 			return nil
 		})
 	}
-}
-
-func quit(g *gocui.Gui, v *gocui.View) error {
-	return gocui.ErrQuit
 }

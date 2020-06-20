@@ -11,6 +11,20 @@ func getShapeArr(shapeType int, direction int, centerPos [2]int) [][2]int {
 	posX, posY := centerPos[0], centerPos[1]
 	switch shapeType {
 	case L:
+		switch direction {
+		case UP:
+			return append(make([][2]int, 0), centerPos, [2]int{posX, posY - 1},
+				[2]int{posX, posY - 2}, [2]int{posX + 2, posY})
+		case LEFT:
+			return append(make([][2]int, 0), [2]int{posX, posY + 1}, [2]int{posX + 2, posY},
+				[2]int{posX - 2, posY + 1}, [2]int{posX + 2, posY + 1})
+		case DOWN:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX + 2, posY + 1}, [2]int{posX + 2, posY + 2})
+		case RIGHT:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX + 4, posY}, [2]int{posX, posY + 1})
+		}
 	case RL:
 	case T:
 	case S:

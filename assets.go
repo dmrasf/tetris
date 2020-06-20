@@ -14,3 +14,8 @@ const (
 	DOWN  int = 2
 	RIGHT int = 3
 )
+
+var (
+	ShapeArr   = [][2]int{}
+	CurrentPos = UP
+)
