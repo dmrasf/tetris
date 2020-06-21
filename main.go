@@ -7,8 +7,6 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-var pos = [2]int{4, 4}
-
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -19,6 +17,7 @@ func main() {
 	g.SetManagerFunc(layout)
 
 	go move(g)
+	go checkShapeIsCanMove(g)
 
 	keyBindings(g)
 
@@ -49,16 +48,37 @@ func layout(g *gocui.Gui) error {
 	return nil
 }
 
+// 检测shape是否可以移动
+func checkShapeIsCanMove(g *gocui.Gui) {
+	for {
+		if isTouchDownBorder(g, ShapeArr) {
+			IsCanMoveToDown = true
+			if isTouchLeftBorder(g, ShapeArr) {
+				IsCanMoveToLeft = true
+			} else {
+				IsCanMoveToLeft = false
+			}
+			if isTouchRightBorder(g, ShapeArr) {
+				IsCanMoveToRight = true
+			} else {
+				IsCanMoveToRight = false
+			}
+		} else {
+			IsCanMoveToDown = false
+			IsCanMoveToLeft = false
+			IsCanMoveToRight = false
+			continue
+		}
+	}
+}
+
 func move(g *gocui.Gui) {
 	for {
-		time.Sleep(400 * time.Millisecond)
-		if len(ShapeArr) != 0 {
-			deleteShape(g, &ShapeArr)
+		time.Sleep(500 * time.Millisecond)
+		if isTouchDownBorder(g, ShapeArr) {
+			pos[1]++
 		}
-		pos[1]++
-		ShapeArr = getShapeArr(I, CurrentPos, pos)
-		drawShape(g, &ShapeArr)
-
+		updateShape(g)
 		g.Update(func(g *gocui.Gui) error {
 			return nil
 		})

@@ -16,6 +16,10 @@ const (
 )
 
 var (
-	ShapeArr   = [][2]int{}
-	CurrentPos = UP
+	ShapeArr         = [][2]int{}
+	CurrentPos       = UP
+	pos              = [2]int{4, 4}
+	IsCanMoveToLeft  = true
+	IsCanMoveToRight = true
+	IsCanMoveToDown  = true
 )
