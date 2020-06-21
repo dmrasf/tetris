@@ -8,6 +8,18 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+func (e *SizeError) Error() string {
+	return e.errMsg
+}
+
+func getGuiSize(g *gocui.Gui) (int, int, error) {
+	maxX, maxY := g.Size()
+	if maxX < 50 || maxY < 20 {
+		return maxX, maxY, &SizeError{"too small"}
+	}
+	return maxX, maxY, nil
+}
+
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -28,19 +40,22 @@ func main() {
 }
 
 func layout(g *gocui.Gui) error {
-	maxX, maxY := g.Size()
-	v_move, err := g.SetView("move", 0, 0, maxX-30, maxY-1)
+	_, _, err := getGuiSize(g)
+	if err != nil {
+		return err
+	}
+	v_move, err := g.SetView("move", 0, 0, 60, 36)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 	v_move.Title = "Move"
-	if v, err := g.SetView("score", maxX-29, 0, maxX-1, maxY/2+2); err != nil {
+	if v, err := g.SetView("score", 61, 0, 83, 20); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Title = "Score"
 	}
-	if v, err := g.SetView("record", maxX-29, maxY/2+3, maxX-1, maxY-1); err != nil {
+	if v, err := g.SetView("record", 61, 21, 83, 36); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}

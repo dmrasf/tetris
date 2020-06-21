@@ -23,4 +23,9 @@ var (
 	IsCanMoveToLeft  = true
 	IsCanMoveToRight = true
 	IsCanMoveToDown  = true
+	Score            = 0
 )
+
+type SizeError struct {
+	errMsg string
+}
