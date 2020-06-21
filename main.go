@@ -59,7 +59,7 @@ func changeShape(g *gocui.Gui) {
 			rand.Seed(time.Now().UnixNano())
 			CurrentDirection = rand.Intn(4)
 			CurrentShape = rand.Intn(7)
-			pos = [2]int{4, 4}
+			pos = [2]int{30, -1}
 
 			ShapeArr = getShapeArr(CurrentShape, CurrentDirection, pos)
 			if err := drawShape(g, &ShapeArr); err != nil {

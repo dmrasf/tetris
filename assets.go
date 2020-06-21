@@ -19,7 +19,7 @@ var (
 	ShapeArr         = [][2]int{}
 	CurrentDirection = UP
 	CurrentShape     = I
-	pos              = [2]int{4, 4}
+	pos              = [2]int{30, -1}
 	IsCanMoveToLeft  = true
 	IsCanMoveToRight = true
 	IsCanMoveToDown  = true
