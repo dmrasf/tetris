@@ -25,14 +25,14 @@ func keyBindings(g *gocui.Gui) error {
 
 func shapeToLeft(g *gocui.Gui, v *gocui.View) error {
 	if IsCanMoveToLeft {
-		pos[0] -= 1
+		pos[0] -= 2
 		updateShape(g)
 	}
 	return nil
 }
 func shapeToRight(g *gocui.Gui, v *gocui.View) error {
 	if IsCanMoveToRight {
-		pos[0] += 1
+		pos[0] += 2
 		updateShape(g)
 	}
 	return nil
@@ -47,15 +47,15 @@ func shapeToDown(g *gocui.Gui, v *gocui.View) error {
 
 // 顺时针方向旋转
 func changeShapeDir(g *gocui.Gui, v *gocui.View) error {
-	switch CurrentPos {
+	switch CurrentDirection {
 	case UP:
-		CurrentPos = RIGHT
+		CurrentDirection = RIGHT
 	case LEFT:
-		CurrentPos = UP
+		CurrentDirection = UP
 	case DOWN:
-		CurrentPos = LEFT
+		CurrentDirection = LEFT
 	case RIGHT:
-		CurrentPos = DOWN
+		CurrentDirection = DOWN
 	}
 	return nil
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/jroimartin/gocui"
@@ -17,7 +18,7 @@ func main() {
 	g.SetManagerFunc(layout)
 
 	go move(g)
-	go checkShapeIsCanMove(g)
+	go changeShape(g)
 
 	keyBindings(g)
 
@@ -48,26 +49,22 @@ func layout(g *gocui.Gui) error {
 	return nil
 }
 
-// 检测shape是否可以移动
-func checkShapeIsCanMove(g *gocui.Gui) {
+func changeShape(g *gocui.Gui) {
 	for {
-		if isTouchDownBorder(g, ShapeArr) {
+		if !IsCanMoveToDown {
 			IsCanMoveToDown = true
-			if isTouchLeftBorder(g, ShapeArr) {
-				IsCanMoveToLeft = true
-			} else {
-				IsCanMoveToLeft = false
+			IsCanMoveToLeft = true
+			IsCanMoveToRight = true
+
+			rand.Seed(time.Now().UnixNano())
+			CurrentDirection = rand.Intn(4)
+			CurrentShape = rand.Intn(7)
+			pos = [2]int{4, 4}
+
+			ShapeArr = getShapeArr(CurrentShape, CurrentDirection, pos)
+			if err := drawShape(g, &ShapeArr); err != nil {
+				log.Panic(err)
 			}
-			if isTouchRightBorder(g, ShapeArr) {
-				IsCanMoveToRight = true
-			} else {
-				IsCanMoveToRight = false
-			}
-		} else {
-			IsCanMoveToDown = false
-			IsCanMoveToLeft = false
-			IsCanMoveToRight = false
-			continue
 		}
 	}
 }
@@ -75,10 +72,10 @@ func checkShapeIsCanMove(g *gocui.Gui) {
 func move(g *gocui.Gui) {
 	for {
 		time.Sleep(500 * time.Millisecond)
-		if isTouchDownBorder(g, ShapeArr) {
+		if IsCanMoveToDown {
 			pos[1]++
+			updateShape(g)
 		}
-		updateShape(g)
 		g.Update(func(g *gocui.Gui) error {
 			return nil
 		})

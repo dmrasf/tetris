@@ -17,7 +17,8 @@ const (
 
 var (
 	ShapeArr         = [][2]int{}
-	CurrentPos       = UP
+	CurrentDirection = UP
+	CurrentShape     = I
 	pos              = [2]int{4, 4}
 	IsCanMoveToLeft  = true
 	IsCanMoveToRight = true

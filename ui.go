@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/jroimartin/gocui"
 )
@@ -79,8 +80,8 @@ func getShapeArr(shapeType int, direction int, centerPos [2]int) [][2]int {
 			return append(make([][2]int, 0), [2]int{posX, posY - 1}, centerPos,
 				[2]int{posX, posY + 1}, [2]int{posX, posY + 2})
 		} else if direction == LEFT || direction == RIGHT {
-			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
-				[2]int{posX - 2, posY}, [2]int{posX + 4, posY})
+			return append(make([][2]int, 0), [2]int{posX - 2, posY}, [2]int{posX, posY},
+				[2]int{posX + 2, posY}, [2]int{posX + 4, posY})
 		}
 	}
 	return make([][2]int, 0)
@@ -90,8 +91,9 @@ func updateShape(g *gocui.Gui) {
 	if len(ShapeArr) != 0 {
 		deleteShape(g, &ShapeArr)
 	}
-	ShapeArr = getShapeArr(I, CurrentPos, pos)
+	ShapeArr = getShapeArr(CurrentShape, CurrentDirection, pos)
 	drawShape(g, &ShapeArr)
+	checkShapeIsCanMove(g)
 }
 
 // 根据形状数组绘制view
@@ -121,6 +123,14 @@ func getViewName(pos [2]int) string {
 	return strconv.Itoa(pos[0]) + "," + strconv.Itoa(pos[1])
 }
 
+func getAllViewName(shapeArr [][2]int) map[[2]int]string {
+	itemName := make(map[[2]int]string)
+	for _, item := range shapeArr {
+		itemName[item] = getViewName(item)
+	}
+	return itemName
+}
+
 // 根据形状判断是否接触到左边界或已固定的view
 func isTouchLeftBorder(g *gocui.Gui, shapeArr [][2]int) bool {
 	for _, item := range shapeArr {
@@ -128,14 +138,14 @@ func isTouchLeftBorder(g *gocui.Gui, shapeArr [][2]int) bool {
 			return false
 		}
 	}
-	//for _, item := range *shapeArr {
-	//if _, err := g.ViewByPosition(item[0]-4, item[1]); err != gocui.ErrUnknownView {
-	//_, ok := itemName[[2]int{item[0] - 2, item[1]}]
-	//if !ok {
-	//return false
-	//}
-	//}
-	//}
+	itemName := getAllViewName(shapeArr)
+	for _, item := range shapeArr {
+		if _, err := g.View(getViewName([2]int{item[0] - 2, item[1]})); err != gocui.ErrUnknownView {
+			if _, ok := itemName[[2]int{item[0] - 2, item[1]}]; !ok {
+				return false
+			}
+		}
+	}
 	return true
 }
 
@@ -145,6 +155,14 @@ func isTouchRightBorder(g *gocui.Gui, shapeArr [][2]int) bool {
 	for _, item := range shapeArr {
 		if item[0] > maxX {
 			return false
+		}
+	}
+	itemName := getAllViewName(shapeArr)
+	for _, item := range shapeArr {
+		if _, err := g.View(getViewName([2]int{item[0] + 2, item[1]})); err != gocui.ErrUnknownView {
+			if _, ok := itemName[[2]int{item[0] + 2, item[1]}]; !ok {
+				return false
+			}
 		}
 	}
 	return true
@@ -158,5 +176,35 @@ func isTouchDownBorder(g *gocui.Gui, shapeArr [][2]int) bool {
 			return false
 		}
 	}
+	itemName := getAllViewName(shapeArr)
+	for _, item := range shapeArr {
+		if _, err := g.View(getViewName([2]int{item[0], item[1] + 1})); err != gocui.ErrUnknownView {
+			if _, ok := itemName[[2]int{item[0], item[1] + 1}]; !ok {
+				return false
+			}
+		}
+	}
 	return true
+}
+
+// 检测shape是否可以移动
+func checkShapeIsCanMove(g *gocui.Gui) {
+	time.Sleep(10 * time.Millisecond)
+	if isTouchDownBorder(g, ShapeArr) {
+		IsCanMoveToDown = true
+		if isTouchLeftBorder(g, ShapeArr) {
+			IsCanMoveToLeft = true
+		} else {
+			IsCanMoveToLeft = false
+		}
+		if isTouchRightBorder(g, ShapeArr) {
+			IsCanMoveToRight = true
+		} else {
+			IsCanMoveToRight = false
+		}
+	} else {
+		IsCanMoveToDown = false
+		IsCanMoveToLeft = false
+		IsCanMoveToRight = false
+	}
 }
