@@ -12,6 +12,7 @@ func keyBindings(g *gocui.Gui) error {
 	return nil
 }
 
+// 顺时针方向旋转
 func changeDir(g *gocui.Gui, v *gocui.View) error {
 	switch CurrentPos {
 	case UP:

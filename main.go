@@ -56,7 +56,7 @@ func move(g *gocui.Gui) {
 			deleteShape(g, &ShapeArr)
 		}
 		pos[1]++
-		ShapeArr = getShapeArr(L, CurrentPos, pos)
+		ShapeArr = getShapeArr(I, CurrentPos, pos)
 		drawShape(g, &ShapeArr)
 
 		g.Update(func(g *gocui.Gui) error {

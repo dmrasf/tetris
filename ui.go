@@ -26,13 +26,62 @@ func getShapeArr(shapeType int, direction int, centerPos [2]int) [][2]int {
 				[2]int{posX + 4, posY}, [2]int{posX, posY + 1})
 		}
 	case RL:
+		switch direction {
+		case UP:
+			return append(make([][2]int, 0), [2]int{posX + 2, posY - 1}, [2]int{posX, posY + 1},
+				[2]int{posX + 2, posY}, [2]int{posX + 2, posY + 1})
+		case LEFT:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX - 2, posY}, [2]int{posX + 2, posY + 1})
+		case DOWN:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX, posY + 1}, [2]int{posX, posY + 2})
+		case RIGHT:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX, posY + 1},
+				[2]int{posX + 4, posY + 1}, [2]int{posX + 2, posY + 1})
+		}
 	case T:
+		switch direction {
+		case UP:
+			return append(make([][2]int, 0), centerPos, [2]int{posX, posY - 1},
+				[2]int{posX - 2, posY}, [2]int{posX + 2, posY})
+		case LEFT:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX, posY - 1},
+				[2]int{posX - 2, posY}, [2]int{posX, posY + 1})
+		case DOWN:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX - 2, posY}, [2]int{posX, posY + 1})
+		case RIGHT:
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX, posY - 1}, [2]int{posX, posY + 1})
+		}
 	case S:
+		if direction == DOWN || direction == UP {
+			return append(make([][2]int, 0), centerPos, [2]int{posX, posY - 1},
+				[2]int{posX + 2, posY}, [2]int{posX + 2, posY + 1})
+		} else if direction == LEFT || direction == RIGHT {
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX - 2, posY + 1}, [2]int{posX, posY + 1})
+		}
 	case RS:
+		if direction == DOWN || direction == UP {
+			return append(make([][2]int, 0), centerPos, [2]int{posX, posY + 1},
+				[2]int{posX + 2, posY}, [2]int{posX + 2, posY - 1})
+		} else if direction == LEFT || direction == RIGHT {
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY + 1},
+				[2]int{posX - 2, posY}, [2]int{posX, posY + 1})
+		}
 	case SQUARE:
 		return append(make([][2]int, 0), centerPos, [2]int{posX + 2, posY},
 			[2]int{posX, posY + 1}, [2]int{posX + 2, posY + 1})
 	case I:
+		if direction == DOWN || direction == UP {
+			return append(make([][2]int, 0), centerPos, [2]int{posX, posY - 1},
+				[2]int{posX, posY + 1}, [2]int{posX, posY + 2})
+		} else if direction == LEFT || direction == RIGHT {
+			return append(make([][2]int, 0), [2]int{posX, posY}, [2]int{posX + 2, posY},
+				[2]int{posX - 2, posY}, [2]int{posX + 4, posY})
+		}
 	}
 	return make([][2]int, 0)
 }
