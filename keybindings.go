@@ -25,21 +25,23 @@ func keyBindings(g *gocui.Gui) error {
 
 func shapeToLeft(g *gocui.Gui, v *gocui.View) error {
 	if IsCanMoveToLeft {
-		pos[0] -= 2
+		CenterPos[0] -= 2
 		updateShape(g)
 	}
 	return nil
 }
 func shapeToRight(g *gocui.Gui, v *gocui.View) error {
 	if IsCanMoveToRight {
-		pos[0] += 2
+		CenterPos[0] += 2
 		updateShape(g)
 	}
 	return nil
 }
 func shapeToDown(g *gocui.Gui, v *gocui.View) error {
 	if IsCanMoveToDown {
-		pos[1]++
+		WriteCenterPosMutex.Lock()
+		CenterPos[1]++
+		WriteCenterPosMutex.Unlock()
 		updateShape(g)
 	}
 	return nil

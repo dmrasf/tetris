@@ -20,6 +20,14 @@ func getGuiSize(g *gocui.Gui) (int, int, error) {
 	return maxX, maxY, nil
 }
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+	NextDirection = rand.Intn(4)
+	NextShape = rand.Intn(7)
+	CenterPos = [2]int{30, -1}
+	NextShapeArr = getShapeArr(NextShape, NextDirection, CenterPos)
+}
+
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -29,9 +37,8 @@ func main() {
 
 	g.SetManagerFunc(layout)
 
-	go move(g)
 	go changeShape(g)
-
+	go move(g)
 	keyBindings(g)
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -49,11 +56,17 @@ func layout(g *gocui.Gui) error {
 		return err
 	}
 	v_move.Title = "Move"
-	if v, err := g.SetView("score", 61, 0, 83, 20); err != nil {
+	if v, err := g.SetView("score", 61, 0, 83, 12); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Title = "Score"
+	}
+	if v, err := g.SetView("nextShape", 61, 13, 83, 20); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Title = "NextShape"
 	}
 	if v, err := g.SetView("record", 61, 21, 83, 36); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -66,31 +79,35 @@ func layout(g *gocui.Gui) error {
 
 func changeShape(g *gocui.Gui) {
 	for {
-		if !IsCanMoveToDown {
+		if FixShape || len(ShapeArr) == 0 {
 			IsCanMoveToDown = true
 			IsCanMoveToLeft = true
 			IsCanMoveToRight = true
+			FixShape = false
 
-			rand.Seed(time.Now().UnixNano())
-			CurrentDirection = rand.Intn(4)
-			CurrentShape = rand.Intn(7)
-			pos = [2]int{30, -1}
-
-			ShapeArr = getShapeArr(CurrentShape, CurrentDirection, pos)
-			if err := drawShape(g, &ShapeArr); err != nil {
+			ShapeArr = NextShapeArr
+			CurrentDirection = NextDirection
+			CurrentShape = NextShape
+			if err := drawShape(g, ShapeArr); err != nil {
 				log.Panic(err)
 			}
+
+			rand.Seed(time.Now().UnixNano())
+			NextDirection = rand.Intn(4)
+			NextShape = rand.Intn(7)
+			CenterPos = [2]int{30, 0}
+
+			deleteShape(g, getPreviewShapePos([2]int{30, 0}))
+			NextShapeArr = getShapeArr(NextShape, NextDirection, [2]int{30, 0})
+			drawShape(g, getPreviewShapePos([2]int{30, 0}))
 		}
 	}
 }
 
 func move(g *gocui.Gui) {
 	for {
-		time.Sleep(500 * time.Millisecond)
-		if IsCanMoveToDown {
-			pos[1]++
-			updateShape(g)
-		}
+		time.Sleep(300 * time.Millisecond)
+		shapeToDown(g, nil)
 		g.Update(func(g *gocui.Gui) error {
 			return nil
 		})

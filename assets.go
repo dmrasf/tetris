@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 const (
 	L      int = 0
 	RL     int = 1
@@ -17,13 +19,22 @@ const (
 
 var (
 	ShapeArr         = [][2]int{}
-	CurrentDirection = UP
-	CurrentShape     = I
-	pos              = [2]int{30, -1}
+	CurrentDirection int
+	CurrentShape     int
+	CenterPos        = [2]int{30, -1}
+	NextShapeArr     = [][2]int{}
+	NextDirection    int
+	NextShape        int
+
 	IsCanMoveToLeft  = true
 	IsCanMoveToRight = true
 	IsCanMoveToDown  = true
-	Score            = 0
+	FixShape         = false
+
+	Score = 0
+
+	WriteCenterPosMutex sync.RWMutex
+	WriteStateMutex     sync.RWMutex
 )
 
 type SizeError struct {

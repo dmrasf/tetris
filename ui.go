@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	"time"
 
 	"github.com/jroimartin/gocui"
 )
@@ -88,17 +87,15 @@ func getShapeArr(shapeType int, direction int, centerPos [2]int) [][2]int {
 }
 
 func updateShape(g *gocui.Gui) {
-	if len(ShapeArr) != 0 {
-		deleteShape(g, &ShapeArr)
-	}
-	ShapeArr = getShapeArr(CurrentShape, CurrentDirection, pos)
-	drawShape(g, &ShapeArr)
+	deleteShape(g, ShapeArr)
+	ShapeArr = getShapeArr(CurrentShape, CurrentDirection, CenterPos)
+	drawShape(g, ShapeArr)
 	checkShapeIsCanMove(g)
 }
 
 // 根据形状数组绘制view
-func drawShape(g *gocui.Gui, shapeArr *[][2]int) error {
-	for _, item := range *shapeArr {
+func drawShape(g *gocui.Gui, shapeArr [][2]int) error {
+	for _, item := range shapeArr {
 		_, err := g.SetView(getViewName(item),
 			item[0]-2, item[1]-1, item[0], item[1])
 		if err != nil && err != gocui.ErrUnknownView {
@@ -109,8 +106,8 @@ func drawShape(g *gocui.Gui, shapeArr *[][2]int) error {
 }
 
 // 根据形状数组删除view
-func deleteShape(g *gocui.Gui, shapeArr *[][2]int) error {
-	for _, item := range *shapeArr {
+func deleteShape(g *gocui.Gui, shapeArr [][2]int) error {
+	for _, item := range shapeArr {
 		if err := g.DeleteView(getViewName(item)); err != nil && err != gocui.ErrUnknownView {
 			return err
 		}
@@ -189,7 +186,7 @@ func isTouchDownBorder(g *gocui.Gui, shapeArr [][2]int) bool {
 
 // 检测shape是否可以移动
 func checkShapeIsCanMove(g *gocui.Gui) {
-	time.Sleep(10 * time.Millisecond)
+	WriteStateMutex.Lock()
 	if isTouchDownBorder(g, ShapeArr) {
 		IsCanMoveToDown = true
 		if isTouchLeftBorder(g, ShapeArr) {
@@ -203,8 +200,16 @@ func checkShapeIsCanMove(g *gocui.Gui) {
 			IsCanMoveToRight = false
 		}
 	} else {
-		IsCanMoveToDown = false
-		IsCanMoveToLeft = false
-		IsCanMoveToRight = false
+		FixShape = true
 	}
+	WriteStateMutex.Unlock()
+}
+
+func getPreviewShapePos(currentPos [2]int) [][2]int {
+	dx, dy := 72-currentPos[0], 17-currentPos[1]
+	previewShapePos := make([][2]int, 0)
+	for _, item := range NextShapeArr {
+		previewShapePos = append(previewShapePos, [2]int{item[0] + dx, item[1] + dy})
+	}
+	return previewShapePos
 }
