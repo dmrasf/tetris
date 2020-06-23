@@ -39,6 +39,7 @@ func main() {
 
 	go changeShape(g)
 	go move(g)
+	go updateScore(g)
 	keyBindings(g)
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -108,6 +109,7 @@ func move(g *gocui.Gui) {
 	for {
 		time.Sleep(300 * time.Millisecond)
 		shapeToDown(g, nil)
+
 		g.Update(func(g *gocui.Gui) error {
 			return nil
 		})
